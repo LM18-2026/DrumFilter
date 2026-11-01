@@ -19,11 +19,11 @@ void DrumFilterAudioProcessor::prepareToPlay(double sampleRate, int)
     fs = sampleRate;
     envelope = 1.0; detectorEnv = previousDetectorEnv = 0.0;
     holdoff = coefficientCounter = 0;
-    *detectorHigh.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(fs, 30.0);
-    *detectorLow.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(fs, 150.0);
+    *detectorHigh.coefficients = *juce::dsp::IIR::Coefficients<float>::makeHighPass(fs, 30.0);
+    *detectorLow.coefficients = *juce::dsp::IIR::Coefficients<float>::makeLowPass(fs, 150.0);
     detectorHigh.reset(); detectorLow.reset();
     for (auto& channel : filters)
-        for (auto& filter : channel) { *filter.state = *juce::dsp::IIR::Coefficients<float>::makeLowPass(fs, juce::jmin(16000.0, fs * 0.45)); filter.reset(); }
+        for (auto& filter : channel) { *filter.coefficients = *juce::dsp::IIR::Coefficients<float>::makeLowPass(fs, juce::jmin(16000.0, fs * 0.45)); filter.reset(); }
 }
 void DrumFilterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
@@ -57,7 +57,7 @@ void DrumFilterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, ju
         if ((coefficientCounter++ & 15) == 0)
         {
             auto coeff = juce::dsp::IIR::Coefficients<float>::makeLowPass(fs, juce::jlimit(20.0, fs * 0.45, cutoff));
-            for (auto& channel : filters) for (auto& filter : channel) *filter.state = *coeff;
+            for (auto& channel : filters) for (auto& filter : channel) *filter.coefficients = *coeff;
         }
         for (int ch = 0; ch < channels; ++ch)
         {
