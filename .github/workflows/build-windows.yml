@@ -9,6 +9,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
+      - name: Validate source tree
+        shell: pwsh
+        run: |
+          if (!(Test-Path Source/PluginProcessor.cpp)) { throw 'PluginProcessor.cpp missing' }
+          if (!(Test-Path Source/PluginProcessor.h)) { throw 'PluginProcessor.h missing' }
       - name: Configure
         run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
       - name: Build
