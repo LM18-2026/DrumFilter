@@ -1,0 +1,21 @@
+name: Build 001 Windows VST3
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release --target DrumFilter_VST3
+      - name: Upload VST3
+        uses: actions/upload-artifact@v4
+        with:
+          name: DrumFilter-Build001-Windows-VST3
+          path: build/DrumFilter_artefacts/Release/VST3/*.vst3
+          if-no-files-found: error
